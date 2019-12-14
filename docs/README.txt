@@ -19,7 +19,7 @@ All PyAMS documentation is available on `ReadTheDocs <https://pyams.readthedocs.
 
 
 What is PyAMS_viewlet?
-====================
+======================
 
 PyAMS_viewlet is a package which defines components called "content providers"; these content
 providers are named adapters which can be used inside Chameleon templates.
