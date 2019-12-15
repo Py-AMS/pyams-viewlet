@@ -51,7 +51,7 @@ setup(name='pyams_viewlet',
       package_data={'': ['*.zcml', '*.txt', '*.pt', '*.pot', '*.po', '*.mo',
                          '*.png', '*.gif', '*.jpeg', '*.jpg', '*.css', '*.js']},
       zip_safe=False,
-      python_requires='>3.5',
+      python_requires='>=3.5',
       # uncomment this to be able to run tests with setup.py
       test_suite="pyams_viewlet.tests.test_utilsdocs.test_suite",
       tests_require=tests_require,
