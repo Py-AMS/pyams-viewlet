@@ -11,6 +11,13 @@ viewlets manager handles the viewlets registered for it:
     >>> from pyramid.testing import setUp, tearDown
     >>> config = setUp()
 
+    >>> from pyams_utils import includeme as include_utils
+    >>> include_utils(config)
+    >>> from pyams_template import includeme as include_template
+    >>> include_template(config)
+    >>> from pyams_viewlet import includeme as include_viewlet
+    >>> include_viewlet(config)
+
     >>> from pyams_viewlet.interfaces import IViewletManager
 
     >>> class ILeftColumn(IViewletManager):
