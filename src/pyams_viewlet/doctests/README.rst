@@ -102,8 +102,8 @@ into a Chameleon template easilly:
     >>> from pyams_template.interfaces import IPageTemplate
     >>> from pyams_template.template import TemplateFactory
     >>> factory = TemplateFactory(template, 'text/html')
-    >>> config.registry.registerAdapter(factory, (Interface, IRequest), IPageTemplate)
-    >>> render = config.registry.getMultiAdapter((content, request), IPageTemplate)
+    >>> config.registry.registerAdapter(factory, (Interface, IRequest, None), IPageTemplate)
+    >>> render = config.registry.getMultiAdapter((content, request, view), IPageTemplate)
     >>> render(**{'context': content, 'request': request, 'view': view})
     '<div><div class="text">Text box!</div></div>'
 
