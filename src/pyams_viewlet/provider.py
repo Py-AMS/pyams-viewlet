@@ -55,7 +55,14 @@ def render_content_provider(econtext, name):
     syntax as in ${structure:provider:my_provider(arg1, arg3=var3)}
     """
 
-    def get_value(econtext, arg):
+    def get_provider(name):
+        provider = registry.queryMultiAdapter((context, request, view), IContentProvider,
+                                              name=name)
+        if provider is not None:
+            econtext['provider'] = provider
+        return provider
+
+    def get_value(arg):
         """Extract argument value from context
 
         Extension expression language is quite simple. Values can be given as
@@ -67,7 +74,7 @@ def render_content_provider(econtext, name):
             return arg[1:-1]
         if '=' in arg:
             key, value = arg.split('=', 1)
-            value = get_value(econtext, value)
+            value = get_value(value)
             return {key.strip(): value}
         try:
             arg = int(arg)  # check integer value
@@ -85,11 +92,14 @@ def render_content_provider(econtext, name):
     request = econtext.get('request')
     view = econtext.get('view')
 
+    registry = request.registry
+
     args, kwargs = [], {}
     func_match = FUNCTION_EXPRESSION.match(name)
     if func_match:
         name, arguments = func_match.groups()
-        for arg in map(lambda x: get_value(econtext, x), ARGUMENTS_EXPRESSION.findall(arguments)):
+        provider = get_provider(name)
+        for arg in map(get_value, ARGUMENTS_EXPRESSION.findall(arguments)):
             if isinstance(arg, dict):
                 kwargs.update(arg)
             else:
@@ -100,9 +110,7 @@ def render_content_provider(econtext, name):
             name = match.groups()[0]
         else:
             raise ContentProviderLookupError(name)
-
-    registry = request.registry
-    provider = registry.queryMultiAdapter((context, request, view), IContentProvider, name=name)
+        provider = get_provider(name)
 
     # raise an exception if the provider was not found.
     if provider is None:
