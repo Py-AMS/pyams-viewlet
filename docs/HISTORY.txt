@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.1.0
+-----
+ - updated doctests
+ - removed ZCML directives
+
 1.0.2
 -----
  - updated Travis-CI configuration
