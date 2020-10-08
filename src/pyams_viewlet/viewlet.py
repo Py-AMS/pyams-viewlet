@@ -70,7 +70,6 @@ class BaseContentProvider(EmptyContentProvider):
     render = get_view_template()
 
 
-@implementer(IContentProvider)
 class ViewContentProvider(BaseContentProvider):
     """Template based content provider"""
 
