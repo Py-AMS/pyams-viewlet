@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.2.0
+-----
+ - updated TALES *provider* expression to be able to define a custom content provider during
+   traversal using request a "provider:name" annotation, instead of using a classical adapter
+   lookup
+
 1.1.0
 -----
  - updated doctests
