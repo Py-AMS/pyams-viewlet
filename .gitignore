@@ -4,4 +4,5 @@
 !/bin/
 !/parts/
 !/develop-eggs/
-!/src/pyams_apm.egg-info/
+!/src/pyams_viewlet/**/__pycache__/
+!/src/pyams_viewlet.egg-info/
