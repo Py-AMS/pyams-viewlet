@@ -25,6 +25,7 @@ from zope.contentprovider.interfaces import BeforeUpdateEvent, ContentProviderLo
 from zope.contentprovider.tales import addTALNamespaceData
 from zope.location.interfaces import ILocation
 
+from pyams_utils.request import get_request_data
 from pyams_utils.tales import ContextExprMixin
 
 
@@ -56,8 +57,14 @@ def render_content_provider(econtext, name):
     """
 
     def get_provider(name):
-        provider = registry.queryMultiAdapter((context, request, view), IContentProvider,
-                                              name=name)
+        # we first look into request annotations to check if a provider implementation has
+        # already been provided during traversal; if not, a simple adapter lookup is done
+        provider = get_request_data(request, 'provider:{}'.format(name))
+        if callable(provider):
+            provider = provider(context, request, view)
+        if provider is None:
+            provider = registry.queryMultiAdapter((context, request, view), IContentProvider,
+                                                  name=name)
         if provider is not None:
             econtext['provider'] = provider
         return provider

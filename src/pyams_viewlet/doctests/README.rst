@@ -358,6 +358,45 @@ from a Viewlet base class, the decorator taking care of adding base classes to y
     '<div class="column">\n    <div class="text">Text box!</div>\n\n    <div><img src="/--static--/myimage.png" /></div>\n</div>'
 
 
+Defining providers during traversal
+-----------------------------------
+
+We had a special use case where a content provider couldn't be defined only throught a simple
+named adapter lookup, but was attached to a context which had been traversed during URL traversal.
+
+To keep track of this event, you can define this custom provider during traversal, using request
+annotations (typically by subscribing to an *IBeforeTraverseEvent* event):
+
+    >>> from zope.annotation.interfaces import IAttributeAnnotatable, IAnnotations
+    >>> from zope.annotation.attribute import AttributeAnnotations
+    >>> config.registry.registerAdapter(AttributeAnnotations, (IAttributeAnnotatable, ), IAnnotations)
+
+    >>> from pyams_utils.request import set_request_data
+
+    >>> template = os.path.join(temp_dir, 'custom-content.pt')
+    >>> with open(template, 'w') as file:
+    ...     _ = file.write("<div>${structure:provider:custom-content}</div>")
+
+    >>> factory = TemplateFactory(template, 'text/html')
+    >>> config.registry.registerAdapter(factory, (Interface, IRequest, None), IPageTemplate)
+    >>> render = config.registry.getMultiAdapter((content, request, view), IPageTemplate)
+    >>> render(**{'context': content, 'request': request, 'view': view})
+    Traceback (most recent call last):
+    ...
+    zope.contentprovider.interfaces.ContentProviderLookupError: zope.contentprovider.interfaces.ContentProviderLookupError: custom-content
+    ...
+
+    >>> from pyams_viewlet.viewlet import ViewContentProvider
+    >>> class CustomProvider(ViewContentProvider):
+    ...     """Custom content provider"""
+    ...     def render(self):
+    ...         return '<p>This is custom content!</p>'
+
+    >>> set_request_data(request, 'provider:custom-content', CustomProvider)
+    >>> render(**{'context': content, 'request': request, 'view': view})
+    '<div><p>This is custom content!</p></div>'
+
+
 Test cleanup:
 
     >>> tearDown()
