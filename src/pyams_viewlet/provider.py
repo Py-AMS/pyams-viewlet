@@ -16,6 +16,7 @@ This module provides the "provider:" TALES expression, which allows inclusion of
 content provider into a Chameleon or ZPT template.
 """
 
+import inspect
 import re
 
 from chameleon.astutil import Symbol
@@ -25,6 +26,7 @@ from zope.contentprovider.interfaces import BeforeUpdateEvent, ContentProviderLo
 from zope.contentprovider.tales import addTALNamespaceData
 from zope.location.interfaces import ILocation
 
+from pyams_utils.factory import is_interface
 from pyams_utils.request import get_request_data
 from pyams_utils.tales import ContextExprMixin
 
@@ -59,9 +61,27 @@ def render_content_provider(econtext, name):
     def get_provider(name):
         # we first look into request annotations to check if a provider implementation has
         # already been provided during traversal; if not, a simple adapter lookup is done
-        provider = get_request_data(request, 'provider:{}'.format(name))
+        provider = get_request_data(request, 'provider:{}:factory'.format(name))
+
+        # if using request annotations, provider can be given as a "direct" factory or as a
+        # dict; if a dict is provided, it's keys are interfaces or classes that the current
+        # context class have to provide or inherit from, and it's matching values are the
+        # provider factories.
+        # if provider is given as a dict, it should be ordered using an OrderedDict so thet
+        # more specific interfaces are provided first!
+        if isinstance(provider, dict):
+            for intf, factory in provider.items():
+                if (is_interface(intf) and intf.providedBy(context)) or \
+                        (inspect.isclass(intf) and isinstance(context, intf)):
+                    provider = factory
+                    break
+            else:
+                provider = None
+
+        # if provider is a callable, we call it!
         if callable(provider):
             provider = provider(context, request, view)
+
         if provider is None:
             provider = registry.queryMultiAdapter((context, request, view), IContentProvider,
                                                   name=name)

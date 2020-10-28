@@ -79,7 +79,10 @@ We can then create a template to include this content provider:
 
     >>> request = DummyRequest()
 
-    >>> @implementer(Interface)
+    >>> class IContent(Interface):
+    ...     """Content marker interface"""
+
+    >>> @implementer(IContent)
     ... class Content:
     ...     """Content class"""
     >>> content = Content()
@@ -392,9 +395,37 @@ annotations (typically by subscribing to an *IBeforeTraverseEvent* event):
     ...     def render(self):
     ...         return '<p>This is custom content!</p>'
 
-    >>> set_request_data(request, 'provider:custom-content', CustomProvider)
+    >>> set_request_data(request, 'provider:custom-content:factory', CustomProvider)
     >>> render(**{'context': content, 'request': request, 'view': view})
     '<div><p>This is custom content!</p></div>'
+
+Another option to define provider factories during traversal is to set a mapping into request
+annotation instead of a simple factory; in this case, mapping keys are interfaces or classes
+that the current context class have to provide or inherit from, and mapping values are the
+matching provider factories. When provider is given as a dict with multiple classes or
+interfaces, they should be ordered (using an *OrderedDict*) so that the most specific
+interfaces or classes are provided first:
+
+    >>> from collections import OrderedDict
+    >>> set_request_data(request, 'provider:custom-content:factory', OrderedDict((
+    ...     (IContent, CustomProvider),
+    ... )))
+    >>> render(**{'context': content, 'request': request, 'view': view})
+    '<div><p>This is custom content!</p></div>'
+
+If no factory is matching, an exception is raised:
+
+    >>> class IAnotherInterface(Interface):
+    ...     """Custom marker interface"""
+
+    >>> set_request_data(request, 'provider:custom-content:factory', OrderedDict((
+    ...     (IAnotherInterface, CustomProvider),
+    ... )))
+    >>> render(**{'context': content, 'request': request, 'view': view})
+    Traceback (most recent call last):
+    ...
+    zope.contentprovider.interfaces.ContentProviderLookupError: zope.contentprovider.interfaces.ContentProviderLookupError: custom-content
+    ...
 
 
 Test cleanup:
