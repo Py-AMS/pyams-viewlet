@@ -36,6 +36,8 @@ from pyams_viewlet.interfaces import IViewlet, IViewletManager
 
 __docformat__ = 'restructuredtext'
 
+from pyams_viewlet.viewlet import register_viewlet
+
 
 LOGGER = logging.getLogger('PyAMS (viewlet)')
 
@@ -323,12 +325,7 @@ class viewletmanager_config:  # pylint: disable=invalid-name
             if settings.get('manager') is not None:
                 if settings.get('weight') is not None:
                     new_class.weight = settings.get('weight')
-                registry.registerAdapter(new_class,
-                                         (settings.get('context', Interface),
-                                          settings.get('layer', IRequest),
-                                          settings.get('view', IView),
-                                          settings.get('manager', IViewletManager)),
-                                         IViewlet, settings.get('name'))
+                register_viewlet(registry, new_class, settings, IViewlet)
 
         info = self.venusian.attach(wrapped, callback, category='pyams_viewlet')
 

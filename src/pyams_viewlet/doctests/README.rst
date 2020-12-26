@@ -293,7 +293,7 @@ can also provide your own template:
     ...     template = get_view_template()
 
     >>> call_decorator(config, viewletmanager_config, RightColumn,
-    ...                provides=IRightColumn)
+    ...                provides=IRightColumn, weight=1)
     Traceback (most recent call last):
     ...
     pyramid.exceptions.ConfigurationError: You must provide a name for a ViewletManager
@@ -313,6 +313,23 @@ can also provide your own template:
     >>> right_column.update()
     >>> right_column.render()
     ''
+
+We can also, finally, declare a viewlet manager which is also a viewlet in a single step, just
+by adding a "manager" argument:
+
+    >>> class IRightInnerViewletManager(Interface):
+    ...     """Inner viewlet manager marker interface"""
+
+    >>> class RightInnerViewletManager(ConditionalViewletManager):
+    ...     """Inner viewlet manager"""
+
+    >>> call_decorator(config, viewletmanager_config, RightInnerViewletManager,
+    ...                for_=Interface,
+    ...                name='inner-right-column',
+    ...                permission='View',
+    ...                manager=RightColumn,
+    ...                weight=1,
+    ...                provides=IRightInnerViewletManager)
 
 
 Protected viewlets
@@ -359,7 +376,7 @@ from a Viewlet base class, the decorator taking care of adding base classes to y
     >>> right_column.reset()
     >>> right_column.update()
     >>> right_column.render()
-    '<div class="column">\n    <div class="text">Text box!</div>\n\n    <div><img src="/--static--/myimage.png" /></div>\n</div>'
+    '<div class="column">\n    \n\n    <div class="text">Text box!</div>\n\n    <div><img src="/--static--/myimage.png" /></div>\n</div>'
 
 
 Defining providers during traversal

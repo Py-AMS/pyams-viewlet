@@ -163,6 +163,16 @@ class Viewlet(EmptyViewlet):
     render = get_view_template()
 
 
+def register_viewlet(registry, klass, settings, provides=IViewlet):
+    """Common viewlet registration"""
+    registry.registerAdapter(klass,
+                             (settings.get('context', Interface),
+                              settings.get('layer', IRequest),
+                              settings.get('view', IView),
+                              settings.get('manager', IViewletManager)),
+                             provides, settings.get('name'))
+
+
 class viewlet_config:  # pylint: disable=invalid-name
     """Class decorator used to declare a viewlet
 
@@ -210,12 +220,7 @@ class viewlet_config:  # pylint: disable=invalid-name
             if registry is None:
                 config = context.config.with_package(info.module)  # pylint: disable=no-member
                 registry = config.registry
-            registry.registerAdapter(new_class,
-                                     (settings.get('context', Interface),
-                                      settings.get('layer', IRequest),
-                                      settings.get('view', IView),
-                                      settings.get('manager', IViewletManager)),
-                                     IViewlet, settings.get('name'))
+            register_viewlet(registry, new_class, settings, IViewlet)
 
         info = self.venusian.attach(wrapped, callback, category='pyams_viewlet')
 
