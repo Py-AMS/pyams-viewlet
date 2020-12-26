@@ -40,7 +40,7 @@ ARGUMENTS_EXPRESSION = re.compile(r'[^(,)]+')
 CONTENT_PROVIDER_NAME = re.compile(r'([A-Za-z0-9_\-\.]+)')
 
 
-def render_content_provider(econtext, name):
+def render_content_provider(econtext, name):  # pylint: disable=too-many-locals,too-many-statements
     """TALES provider: content provider
 
     This TALES expression is used to render a registered "content provider", which
@@ -114,18 +114,18 @@ def render_content_provider(econtext, name):
         else:
             return arg
 
-    name = name.strip()
-    context = econtext.get('context')
-    request = econtext.get('request')
-    view = econtext.get('view')
+    def get_context_arg(arg):
+        """Extract a value if present in kwargs, otherwise look into context"""
+        if arg in kwargs:
+            return kwargs.pop(arg)
+        return econtext.get(arg)
 
-    registry = request.registry
+    name = name.strip()
 
     args, kwargs = [], {}
     func_match = FUNCTION_EXPRESSION.match(name)
     if func_match:
         name, arguments = func_match.groups()
-        provider = get_provider(name)
         for arg in map(get_value, ARGUMENTS_EXPRESSION.findall(arguments)):
             if isinstance(arg, dict):
                 kwargs.update(arg)
@@ -137,7 +137,13 @@ def render_content_provider(econtext, name):
             name = match.groups()[0]
         else:
             raise ContentProviderLookupError(name)
-        provider = get_provider(name)
+
+    context = get_context_arg('context')
+    request = get_context_arg('request')
+    view = get_context_arg('view')
+
+    registry = request.registry
+    provider = get_provider(name)
 
     # raise an exception if the provider was not found.
     if provider is None:
