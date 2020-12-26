@@ -27,6 +27,7 @@ from zope.contentprovider.interfaces import BeforeUpdateEvent
 from zope.interface import Interface, classImplements, implementer
 from zope.interface.interfaces import ComponentLookupError
 from zope.location.interfaces import ILocation
+from zope.schema.fieldproperty import FieldProperty
 
 from pyams_template.template import get_view_template
 from pyams_utils.request import check_request
@@ -53,11 +54,14 @@ class ViewletManager:
 
     viewlets = None
 
-    def __init__(self, context, request, view):
-        self.__updated = False
-        self.__parent__ = view
+    render_empty = FieldProperty(IViewletManager['render_empty'])
+
+    def __init__(self, context, request, view, manager=None):
         self.context = context
         self.request = request
+        self.view = self.__parent__ = view
+        self.manager = manager
+        self.__updated = False
 
     def __getitem__(self, name):
         """See zope.interface.common.mapping.IReadMapping"""
@@ -136,6 +140,8 @@ class ViewletManager:
 
     def update(self):
         """See :py:class:`zope.contentprovider.interfaces.IContentProvider`"""
+        registry = self.request.registry
+        registry.notify(BeforeUpdateEvent(self, self.request))
         # check permission
         if self.permission and not self.request.has_permission(self.permission,
                                                                context=self.context):
@@ -154,7 +160,10 @@ class ViewletManager:
     def render(self):
         """See :py:class:`zope.contentprovider.interfaces.IContentProvider`"""
         # Check for previous update
-        if not (self.__updated and self.viewlets):
+        if not self.__updated:
+            return ''
+        # Check for empty viewlet manager
+        if (not self.viewlets) and (not self.render_empty):
             return ''
         # Now render the view
         if self.template:
@@ -199,9 +208,12 @@ def get_label(item, request=None):
     """Get sort label of a given viewlet"""
     _, viewlet = item
     try:
+        label = getattr(viewlet, 'label', None)
+        if not label:
+            return '--'
         if request is None:
             request = check_request()
-        return request.localizer.translate(viewlet.label)
+        return request.localizer.translate(label)
     except AttributeError:
         return '--'
 
@@ -266,6 +278,9 @@ class viewletmanager_config:  # pylint: disable=invalid-name
         applied on an Interface, this will be the decorated interface; if the
         decorated is applied on a class and if this argument is not specified,
         the manager will provide IViewletManager interface.
+    :param manager: if a manager interface or class is provided, the viewlet manager
+        will be also registered as a viewlet for the given manager
+    :param weight: if provided, this will be the weight of the viewlet
     """
 
     venusian = venusian  # for testing injection
@@ -305,6 +320,15 @@ class viewletmanager_config:  # pylint: disable=invalid-name
                                       settings.get('layer', IRequest),
                                       settings.get('view', IView)),
                                      provides, settings.get('name'))
+            if settings.get('manager') is not None:
+                if settings.get('weight') is not None:
+                    new_class.weight = settings.get('weight')
+                registry.registerAdapter(new_class,
+                                         (settings.get('context', Interface),
+                                          settings.get('layer', IRequest),
+                                          settings.get('view', IView),
+                                          settings.get('manager', IViewletManager)),
+                                         IViewlet, settings.get('name'))
 
         info = self.venusian.attach(wrapped, callback, category='pyams_viewlet')
 
