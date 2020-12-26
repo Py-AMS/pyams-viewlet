@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.3.0
+-----
+ - updated viewletmanager_config to be able to declare a viewlet manager as a viewlet in a
+   single step
+ - updated "provider" TALES extension to be able to provide arguments to extension
+ - small updates in registry access
+
 1.2.1
 -----
  - updated TALES *provider* expression to also support a mapping of provider factories into

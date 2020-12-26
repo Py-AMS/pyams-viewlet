@@ -18,6 +18,7 @@ The module defines viewlet and viewlets manager interfaces.
 from zope.contentprovider.interfaces import IContentProvider
 from zope.interface import Attribute
 from zope.interface.common.mapping import IReadMapping
+from zope.schema import Bool, List, Object
 
 
 __docformat__ = 'restructuredtext'
@@ -55,6 +56,19 @@ class IViewletManager(IContentProvider, IReadMapping):
 
       (5) Render itself by rendering the HTML content of the viewlets.
     """
+
+    manager = Attribute("The ViewletManager to which this manager is attached if also "
+                        "defined as a viewlet")
+
+    permission = Attribute("Permission required to display the viewlet manager")
+
+    template = Attribute("Chameleon template used for rendering")
+
+    viewlets = List(title="Viewlets list",
+                    value_type=Object(schema=IViewlet))
+
+    render_empty = Bool(title="Render when empty?",
+                        default=False)
 
     def filter(self, viewlets):
         """Filter manager viewlets"""

@@ -85,6 +85,7 @@ We can then create a template to include this content provider:
     >>> @implementer(IContent)
     ... class Content:
     ...     """Content class"""
+    ...     title = 'My Content'
     >>> content = Content()
 
     >>> from pyramid.interfaces import IView, IRequest
@@ -96,7 +97,7 @@ We can then create a template to include this content provider:
     ...         self.request = request
     >>> view = View(content, request)
 
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     "<div><div>I'm a content provider!</div></div>"
 
 And that's it!
@@ -129,33 +130,33 @@ update method call:
     >>> template = os.path.join(temp_dir, 'title-content.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:title-content}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     '<div>Hello, John Doe!</div>'
 
     >>> template = os.path.join(temp_dir, 'title-content-2.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:title-content('Welcome')}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     '<div>Welcome, John Doe!</div>'
 
     >>> template = os.path.join(temp_dir, 'title-content-3.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:title-content(title='Jack')}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     '<div>Hello, Jack!</div>'
 
 You can use dotted variables names in provider call:
 
     >>> template = os.path.join(temp_dir, 'title-content-4.pt')
     >>> with open(template, 'w') as file:
-    ...     _ = file.write("<div>${structure:provider:title-content(title=provider.value)}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
-    '<div>Hello, Jackson!</div>'
+    ...     _ = file.write("<div>${structure:provider:title-content(title=context.title)}!</div>")
+    >>> render(template, {'context': content, 'request': request, 'view': view})
+    '<div>Hello, My Content!</div>'
 
     >>> template = os.path.join(temp_dir, 'title-content-5.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:title-content(title=123)}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     '<div>Hello, 123!</div>'
 
 Of course, calling an unregistered content provider raises an exception:
@@ -163,7 +164,7 @@ Of course, calling an unregistered content provider raises an exception:
     >>> template = os.path.join(temp_dir, 'title-content-6.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:unknown}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     Traceback (most recent call last):
     ...
     zope.contentprovider.interfaces.ContentProviderLookupError: zope.contentprovider.interfaces.ContentProviderLookupError: unknown
@@ -172,7 +173,7 @@ Of course, calling an unregistered content provider raises an exception:
     >>> template = os.path.join(temp_dir, 'title-content-7.pt')
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>${structure:provider:@123}!</div>")
-    >>> render(template, {'content': content, 'request': request, 'view': view})
+    >>> render(template, {'context': content, 'request': request, 'view': view})
     Traceback (most recent call last):
     ...
     zope.contentprovider.interfaces.ContentProviderLookupError: zope.contentprovider.interfaces.ContentProviderLookupError: @123

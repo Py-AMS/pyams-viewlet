@@ -39,9 +39,10 @@ class EmptyContentProvider:
 
     permission = None
 
-    def __init__(self, context, request):
+    def __init__(self, context, request, view=None):
         self.context = context
         self.request = request
+        self.view = self.__parent__ = view
 
     def __call__(self):
         if self.permission and not self.request.has_permission(self.permission,
@@ -72,10 +73,6 @@ class BaseContentProvider(EmptyContentProvider):
 
 class ViewContentProvider(BaseContentProvider):
     """Template based content provider"""
-
-    def __init__(self, context, request, view):
-        super(ViewContentProvider, self).__init__(context, request)
-        self.view = self.__parent__ = view
 
 
 class contentprovider_config:  # pylint: disable=invalid-name
@@ -149,7 +146,7 @@ class EmptyViewlet:
     def __init__(self, context, request, view, manager):
         self.context = context
         self.request = request
-        self.__parent__ = view
+        self.view = self.__parent__ = view
         self.manager = manager
 
     def update(self):
