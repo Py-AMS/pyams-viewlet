@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.3.3
+-----
+ - packaging version mismatch!
+
 1.3.2
 -----
  - refactored viewlet registration code
