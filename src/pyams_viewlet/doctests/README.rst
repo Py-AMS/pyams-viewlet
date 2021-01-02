@@ -361,12 +361,12 @@ from a Viewlet base class, the decorator taking care of adding base classes to y
     ...                name='text-box',
     ...                for_=Interface,
     ...                manager=IRightColumn,
-    ...                weight=1,
+    ...                weight=2,
     ...                permission='view')
     >>> call_decorator(config, viewlet_config, ImageBox,
     ...                name='image-box',
     ...                manager=IRightColumn,
-    ...                weight=2,
+    ...                weight=3,
     ...                permission='system.forbidden')
 
     >>> from pyams_template.template import template_config
