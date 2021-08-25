@@ -21,6 +21,7 @@ import logging
 import venusian
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IRequest, IView
+from zope.component import ComponentLookupError
 from zope.contentprovider.interfaces import IContentProvider
 from zope.interface import Interface, implementer
 
@@ -44,17 +45,17 @@ class EmptyContentProvider:
         self.request = request
         self.view = self.__parent__ = view
 
-    def __call__(self):
+    def __call__(self, template_name=''):
         if self.permission and not self.request.has_permission(self.permission,
                                                                context=self.context):
             return ''
         self.update()
-        return self.render()
+        return self.render(template_name)
 
     def update(self):
         """See `IContentProvider` interface"""
 
-    def render(self):  # pylint: disable=no-self-use
+    def render(self, template_name=''):  # pylint: disable=no-self-use
         """See `IContentProvider` interface"""
         return ''
 
@@ -68,7 +69,13 @@ class BaseContentProvider(EmptyContentProvider):
         for resource in self.resources:
             resource.need()
 
-    render = get_view_template()
+    def render(self, template_name=''):
+        template = get_view_template(name=template_name)
+        try:
+            return template(self)
+        except ComponentLookupError:
+            template = get_view_template()
+            return template(self)
 
 
 class ViewContentProvider(BaseContentProvider):

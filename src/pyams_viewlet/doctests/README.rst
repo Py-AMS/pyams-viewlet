@@ -384,7 +384,7 @@ from a Viewlet base class, the decorator taking care of adding base classes to y
 Defining providers during traversal
 -----------------------------------
 
-We had a special use case where a content provider couldn't be defined only throught a simple
+We had a special use case where a content provider couldn't be defined only through a simple
 named adapter lookup, but was attached to a context which had been traversed during URL traversal.
 
 To keep track of this event, you can define this custom provider during traversal, using request
@@ -412,7 +412,7 @@ annotations (typically by subscribing to an *IBeforeTraverseEvent* event):
     >>> from pyams_viewlet.viewlet import ViewContentProvider
     >>> class CustomProvider(ViewContentProvider):
     ...     """Custom content provider"""
-    ...     def render(self):
+    ...     def render(self, template_name=''):
     ...         return '<p>This is custom content!</p>'
 
     >>> set_request_data(request, 'provider:custom-content:factory', CustomProvider)
@@ -446,6 +446,48 @@ If no factory is matching, an exception is raised:
     ...
     zope.contentprovider.interfaces.ContentProviderLookupError: zope.contentprovider.interfaces.ContentProviderLookupError: custom-content
     ...
+
+
+Using custom templates for content providers
+--------------------------------------------
+
+It's sometimes required to be able to use a custom template instead of the default template
+for any content provider.
+
+Template name can be provided when a template is registered (default name is the empty string).
+You can then use the "template_name" argument of the "render" method:
+
+    >>> class CustomTemplateProvider(ViewContentProvider):
+    ...     """Custom template provider"""
+
+    >>> default_template = os.path.join(temp_dir, 'default-template.pt')
+    >>> with open(default_template, 'w') as file:
+    ...     _ = file.write("<div>This is default template</div>")
+
+    >>> custom_template = os.path.join(temp_dir, 'custom-template.pt')
+    >>> with open(custom_template, 'w') as file:
+    ...     _ = file.write("<div>This is custom template</div>")
+
+    >>> from pyams_template.template import override_template
+
+    >>> override_template(CustomTemplateProvider, template=default_template)
+    >>> provider = CustomTemplateProvider(content, request)
+    >>> provider()
+    '<div>This is default template</div>'
+
+As long as the requested template is not registered, the default one is used:
+
+    >>> provider('custom')
+    '<div>This is default template</div>'
+
+We can register a custom template now:
+
+    >>> override_template(CustomTemplateProvider, template=custom_template, name='custom')
+    >>> provider('custom')
+    '<div>This is custom template</div>'
+
+This feature is not available for viewlets, as viewlets are not rendered directly but are rendered
+by their viewlet manager...
 
 
 Test cleanup:
