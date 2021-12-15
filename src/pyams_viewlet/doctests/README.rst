@@ -21,8 +21,17 @@ These doctests are based on zope.viewlet doctests.
 Defining content providers
 --------------------------
 
-A content provider is a custom named adapter, eventually registered for a specific kind of
-context, request and view, which is declared to provide HTML content through templates.
+The most simple content provider is called "RawContentProvider"; it just renders it's raw
+HTML content, but provides a standard content provider API:
+
+    >>> from pyams_viewlet.viewlet import RawContentProvider
+    >>> provider = RawContentProvider(html="<p>I'm a raw content provider!</p>")
+    >>> provider.render()
+    "<p>I'm a raw content provider!</p>"
+
+But a content provider is more generally a custom named adapter, eventually registered for a
+specific kind of context, request and view, which is declared to provide HTML content through
+templates.
 
 The "provider:" TALES expression is registered automatically when the package is included into
 Pyramid configuraiton:
@@ -38,7 +47,7 @@ Pyramid configuraiton:
     >>> with open(template, 'w') as file:
     ...     _ = file.write("<div>I'm a content provider!</div>")
 
-A custom "contentprovider_config" decorator cna be used to register a content provider:
+A custom "contentprovider_config" decorator can be used to register a content provider:
 
     >>> from pyams_viewlet.viewlet import contentprovider_config
     >>> from pyams_template.template import template_config

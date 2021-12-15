@@ -60,6 +60,17 @@ class EmptyContentProvider:
         return ''
 
 
+class RawContentProvider(EmptyContentProvider):
+    """Raw HTML content provider"""
+
+    def __init__(self, context=None, request=None, view=None, html=None):
+        super().__init__(context, request, view)
+        self.html = html
+
+    def render(self, template_name=''):
+        return self.html
+
+
 class BaseContentProvider(EmptyContentProvider):
     """Base template based content provider"""
 
