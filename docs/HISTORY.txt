@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.6.0
+-----
+ - added RawContentProvider class, to provide a component rendering raw HTML code but with the
+   content provider API
+
 1.5.0
 -----
  - added "template_name" argument to content provider "render" method, to be able to
