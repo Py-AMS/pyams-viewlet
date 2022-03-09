@@ -76,17 +76,17 @@ class BaseContentProvider(EmptyContentProvider):
 
     resources = ()
 
-    def update(self):
-        for resource in self.resources:
-            resource.need()
-
     def render(self, template_name=''):
         template = get_view_template(name=template_name)
         try:
-            return template(self)
+            result = template(self).strip(' \n\t')
         except ComponentLookupError:
             template = get_view_template()
-            return template(self)
+            result = template(self).strip(' \n\t')
+        if result:
+            for resource in self.resources:
+                resource.need()
+        return result
 
 
 class ViewContentProvider(BaseContentProvider):
