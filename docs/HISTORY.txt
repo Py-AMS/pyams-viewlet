@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.6.1
+-----
+ - don't load content provider resources when rendered content is empty
+
 1.6.0
 -----
  - added RawContentProvider class, to provide a component rendering raw HTML code but with the
