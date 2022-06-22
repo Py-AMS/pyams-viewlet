@@ -76,6 +76,11 @@ class BaseContentProvider(EmptyContentProvider):
 
     resources = ()
 
+    def get_resources(self):
+        """Include required Fanstatic resources"""
+        for resource in self.resources:
+            resource.need()
+
     def render(self, template_name=''):
         template = get_view_template(name=template_name)
         try:
@@ -84,8 +89,7 @@ class BaseContentProvider(EmptyContentProvider):
             template = get_view_template()
             result = template(self).strip(' \n\t')
         if result:
-            for resource in self.resources:
-                resource.need()
+            self.get_resources()
         return result
 
 
