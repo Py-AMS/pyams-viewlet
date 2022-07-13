@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.6.2
+-----
+ - added method to base content provider to load required Fanstatic resources
+
 1.6.1
 -----
  - don't load content provider resources when rendered content is empty
