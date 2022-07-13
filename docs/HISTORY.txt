@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.6.3
+-----
+ - updated Gitlab-CI configuration file
+
 1.6.2
 -----
  - added method to base content provider to load required Fanstatic resources
