@@ -148,7 +148,10 @@ def render_content_provider(econtext, name):  # pylint: disable=too-many-locals,
     provider = get_provider(name)
 
     # raise an exception if the provider was not found.
+    ignore_missing = get_context_arg('ignore_missing')
     if provider is None:
+        if ignore_missing is True:
+            return ''
         raise ContentProviderLookupError(name)
 
     # add the __name__ attribute if it implements ILocation
