@@ -96,6 +96,8 @@ def render_content_provider(econtext, name):  # pylint: disable=too-many-locals,
         positioned strings, integers or named arguments of the same types.
         """
         arg = arg.strip()
+        if arg in ('True', 'False'):
+            return arg == 'True'
         if arg.startswith('"') or arg.startswith("'"):
             # may be a quoted string...
             return arg[1:-1]
