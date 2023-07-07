@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.7.0
+-----
+ - added support for undefined content providers
+ - added support for boolean provider arguments
+ - added support for Python 3.10 and 3.11
+
 1.6.3
 -----
  - updated Gitlab-CI configuration file
