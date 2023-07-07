@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.7.1
+-----
+ - packaging issue
+
 1.7.0
 -----
  - added support for undefined content providers
