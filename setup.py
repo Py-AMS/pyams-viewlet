@@ -23,7 +23,7 @@ DOCS = os.path.join(os.path.dirname(__file__),
 README = os.path.join(DOCS, 'README.rst')
 HISTORY = os.path.join(DOCS, 'HISTORY.rst')
 
-version = '1.7.1'
+version = '2.0.0'
 long_description = open(README).read() + '\n\n' + open(HISTORY).read()
 
 tests_require = []
@@ -50,8 +50,8 @@ setup(name='pyams_viewlet',
       include_package_data=True,
       package_data={'': ['*.zcml', '*.txt', '*.pt', '*.pot', '*.po', '*.mo',
                          '*.png', '*.gif', '*.jpeg', '*.jpg', '*.css', '*.js']},
+      python_requires='>=3.7',
       zip_safe=False,
-      python_requires='>=3.5',
       # uncomment this to be able to run tests with setup.py
       test_suite="pyams_viewlet.tests.test_utilsdocs.test_suite",
       tests_require=tests_require,
@@ -62,7 +62,7 @@ setup(name='pyams_viewlet',
           'chameleon',
           'pyams_template',
           'pyams_utils',
-          'pyramid',
+          'pyramid >= 2.0.0',
           'venusian',
           'zope.contentprovider',
           'zope.interface',

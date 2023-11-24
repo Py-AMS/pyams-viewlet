@@ -1,6 +1,10 @@
 Changelog
 =========
 
+2.0.0
+-----
+ - upgrade to Pyramid 2.0
+
 1.7.1
 -----
  - packaging issue
