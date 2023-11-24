@@ -146,7 +146,7 @@ class contentprovider_config:  # pylint: disable=invalid-name
                                       settings.get('view', IView)),
                                      IContentProvider, settings.get('name'))
 
-        info = self.venusian.attach(wrapped, callback, category='pyams_viewlet')
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
 
         if info.scope == 'class':  # pylint: disable=no-member
             # if the decorator was attached to a method in a class, or
@@ -244,7 +244,7 @@ class viewlet_config:  # pylint: disable=invalid-name
                 registry = config.registry
             register_viewlet(registry, new_class, settings, IViewlet)
 
-        info = self.venusian.attach(wrapped, callback, category='pyams_viewlet')
+        info = self.venusian.attach(wrapped, callback, category='pyramid')
 
         if info.scope == 'class':  # pylint: disable=no-member
             # if the decorator was attached to a method in a class, or
